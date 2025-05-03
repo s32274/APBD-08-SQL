@@ -8,23 +8,30 @@ public class TripsService : ITripsService
     private readonly string _connectionString = 
         "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=APBD;Integrated Security=True;";
     
-    public async Task<List<TripDto>> GetTrips()
+    // 1. GET /api/trips
+    public async Task<List<TripDto>> GetTripsAsync(CancellationToken cancellationToken)
     {
         // idWycieczki -> wycieczka (zawiera listę krajów)
         var tripsDict = new Dictionary<int, TripDto>();
 
         // dzięki JOIN'om zapytanie zapamiętuje kraje związane z konkretną wycieczką
-        string command =
-            @"    SELECT 
-                    t.IdTrip, t.Name, t.Description, t.DateFrom, t.DateTo, t.MaxPeople, 
-                    c.Name AS CountryName, c.IdCountry
-                    FROM Trip t
-                    JOIN Country_Trip ct ON t.IdTrip = ct.IdTrip
-                    JOIN Country c ON c.IdCountry = ct.IdCountry
-                  ";
+        string command = @"
+            SELECT 
+                t.IdTrip, 
+                t.Name, 
+                t.Description, 
+                t.DateFrom, 
+                t.DateTo, 
+                t.MaxPeople, 
+                c.Name AS CountryName, 
+                c.IdCountry
+            FROM Trip t
+            JOIN Country_Trip ct ON t.IdTrip = ct.IdTrip
+            JOIN Country c ON c.IdCountry = ct.IdCountry
+        ";
         
-        using (SqlConnection conn = new SqlConnection(_connectionString))
-        using (SqlCommand cmd = new SqlCommand(command, conn))
+        await using (SqlConnection conn = new SqlConnection(_connectionString))
+        await using (SqlCommand cmd = new SqlCommand(command, conn))
         {
             await conn.OpenAsync();
 
@@ -48,11 +55,11 @@ public class TripsService : ITripsService
                         var trip = new TripDto()
                         {
                             IdTrip = tripId,
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
-                            Description = reader.GetString(reader.GetOrdinal("Description")),
-                            DateFrom = reader.GetDateTime(reader.GetOrdinal("DateFrom")),
-                            DateTo = reader.GetDateTime(reader.GetOrdinal("DateTo")),
-                            MaxPeople = reader.GetInt32(reader.GetOrdinal("MaxPeople")),
+                            Name = (string) reader["Name"],
+                            Description = (string) reader["Description"],
+                            DateFrom = (DateTime) reader["DateFrom"],
+                            DateTo = (DateTime) reader["DateTo"],
+                            MaxPeople = (Int32) reader["MaxPeople"],
                             Countries = new List<CountryDto>()
                         };
 

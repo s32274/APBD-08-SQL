@@ -4,5 +4,5 @@ namespace Tutorial8.Services;
 
 public interface ITripsService
 {
-    Task<List<TripDto>> GetTrips();
+    Task<List<TripDto>> GetTripsAsync(CancellationToken cancellationToken);
 }
