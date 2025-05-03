@@ -5,11 +5,12 @@ namespace Tutorial8.Services;
 
 public class TripsService : ITripsService
 {
-    private readonly string _connectionString = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=APBD;Integrated Security=True;";
+    private readonly string _connectionString = 
+        "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=APBD;Integrated Security=True;";
     
-    public async Task<List<TripDTO>> GetTrips()
+    public async Task<List<TripDto>> GetTrips()
     {
-        var trips = new List<TripDTO>();
+        var trips = new List<TripDto>();
 
         string command = "SELECT IdTrip, Name FROM Trip";
         
@@ -22,8 +23,8 @@ public class TripsService : ITripsService
             {
                 while (await reader.ReadAsync())
                 {
-                    int idOrdinal = reader.GetOrdinal("Id");
-                    trips.Add(new TripDTO()
+                    int idOrdinal = reader.GetOrdinal("IdTrip");
+                    trips.Add(new TripDto()
                     {
                         IdTrip = reader.GetInt32(idOrdinal),
                         Name = reader.GetString(1),

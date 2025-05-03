@@ -2,7 +2,7 @@
 
 namespace Tutorial8.Models.DTOs;
 
-public class TripDTO
+public class TripDto
 {
     public int IdTrip { get; set; }
     
@@ -13,10 +13,5 @@ public class TripDTO
     public string DateTo { get; set; }
     public int MaxPeople { get; set; }
     
-    public List<CountryDTO> Countries { get; set; }
-}
-
-public class CountryDTO
-{
-    public string Name { get; set; }
+    public List<CountryDto> Countries { get; set; }
 }

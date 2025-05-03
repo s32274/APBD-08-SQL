@@ -1,6 +1,6 @@
 ﻿namespace Tutorial8.Models.DTOs;
 
-public class ClientTrip
+public class ClientTripDto
 {
     public int IdClient { get; set; }
     public int IdTrip { get; set; }
