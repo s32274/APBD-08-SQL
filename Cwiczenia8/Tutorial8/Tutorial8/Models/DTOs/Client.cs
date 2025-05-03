@@ -6,6 +6,7 @@ public class Client
 {
     public int IdClient { get; set; }
     // comment
+    // comment 2
     
     [StringLength(120)]
     public string FirstName { get; set; }
