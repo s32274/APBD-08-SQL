@@ -5,7 +5,7 @@ namespace Tutorial8.Models.DTOs;
 public class Client
 {
     public int IdClient { get; set; }
-    // 
+    // comment
     
     [StringLength(120)]
     public string FirstName { get; set; }
