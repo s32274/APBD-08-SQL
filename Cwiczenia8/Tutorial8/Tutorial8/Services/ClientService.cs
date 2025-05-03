@@ -19,7 +19,7 @@ public class ClientService
         // Informacje z pierwszego zapytania SQL + te z tabeli Client_Trip
         
         string command = @"
-            SELECT  
+            SELECT 
                 cltr.IdClient,
                 t.IdTrip,
                 t.Name,
@@ -47,21 +47,38 @@ public class ClientService
 
             using (var reader = await cmd.ExecuteReaderAsync(cancellationToken))
             {
+                
                 while (await reader.ReadAsync(cancellationToken))
                 {
-                    var clientTrip = new ClientTripDto
+                    int idTrip = (Int32)reader["IdTrip"];
+                    
+                    // żeby kilka razy nie dodać tej samej wycieczki, sprawdza po id, czy taka już nie istnieje
+                    bool tripExists = false;
+                    foreach (var trip in clientTrips)
                     {
-                        IdClient = (Int32) reader["IdClient"],
-                        IdTrip = (Int32) reader["IdTrip"],
-                        RegisteredAt = (Int32) reader["RegisteredAt"],
-                        PaymentDate = (Int32) reader["PaymentDate"],
-                        Name = (string) reader["Name"],
-                        Description = (string) reader["Description"],
-                        DateFrom = (DateTime) reader["DateFrom"],
-                        DateTo = (DateTime) reader["DateTo"],
-                        MaxPeople = (Int32) reader["MaxPeople"]
-                    };
-                    clientTrips.Add(clientTrip);
+                        if (idTrip == trip.IdTrip)
+                        {
+                            tripExists = true;
+                            break;
+                        };
+                    }
+
+                    if (!tripExists)
+                    {
+                        var clientTrip = new ClientTripDto
+                        {
+                            IdClient = (Int32) reader["IdClient"],
+                            IdTrip = idTrip,
+                            RegisteredAt = (Int32) reader["RegisteredAt"],
+                            PaymentDate = (Int32) reader["PaymentDate"],
+                            Name = (string) reader["Name"],
+                            Description = (string) reader["Description"],
+                            DateFrom = (DateTime) reader["DateFrom"],
+                            DateTo = (DateTime) reader["DateTo"],
+                            MaxPeople = (Int32) reader["MaxPeople"]
+                        };
+                        clientTrips.Add(clientTrip);
+                    }
                 }
             }
         }
