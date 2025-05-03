@@ -25,7 +25,7 @@ public class TripsService : ITripsService
                     int idOrdinal = reader.GetOrdinal("Id");
                     trips.Add(new TripDTO()
                     {
-                        Id = reader.GetInt32(idOrdinal),
+                        IdTrip = reader.GetInt32(idOrdinal),
                         Name = reader.GetString(1),
                     });
                 }
