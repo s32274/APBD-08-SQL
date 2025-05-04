@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Tutorial8.Models.DTOs;
 using Tutorial8.Services;
 
 namespace Tutorial8.Controllers;
@@ -26,5 +27,33 @@ public class ClientsController : ControllerBase
         }
         
         return Ok(trips);
+    }
+    
+    // 3. POST /api/clients
+    // Zwraca nowo utworzone ID klienta
+    [HttpPost("clients")]
+    public async Task<IActionResult> AddClient(
+        string firstName,
+        string lastName,
+        string email,
+        string telephone,
+        string pesel,
+        CancellationToken cancellationToken
+    )
+    {
+        if (!(ClientDto.ValidateFirstName(firstName)
+              && ClientDto.ValidateLastName(lastName)
+              && ClientDto.ValidateEmail(email)
+              && ClientDto.ValidateTelephone(telephone)
+              && ClientDto.ValidatePesel(pesel)
+            ))
+        { 
+            return BadRequest("Błędny format danych wejściowych.");
+        }
+
+        var newClientId =
+            await _clientService.AddClient(firstName, lastName, email, telephone, pesel, cancellationToken);
+        
+        return Ok("ID nowego klienta = " + newClientId);
     }
 }

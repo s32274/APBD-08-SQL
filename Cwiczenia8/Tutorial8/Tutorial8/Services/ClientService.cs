@@ -1,4 +1,6 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Tutorial8.Models.DTOs;
 
 namespace Tutorial8.Services;
@@ -84,5 +86,46 @@ public class ClientService
         }
         
         return clientTrips;
+    }
+
+    // 3. POST /api/clients
+    public async Task<int> AddClient(
+        string firstName, 
+        string lastName, 
+        string email, 
+        string telephone,
+        string pesel,
+        CancellationToken cancellationToken)
+    {
+        string command = @"
+                            INSERT INTO Client(FirstName, LastName, Email, Telephone, Pesel)
+                            OUTPUT INSERTED.IdClient
+                            VALUES(@firstName, @lastName, @email, @telephone, @pesel)
+                        ";
+
+        await using var conn = new SqlConnection(_connectionString) ;
+        await using var cmd = new SqlCommand(command, conn);
+
+        cmd.Parameters.AddWithValue("@firstName", firstName);
+        cmd.Parameters.AddWithValue("@lastName", lastName);
+        cmd.Parameters.AddWithValue("@email", email);
+        cmd.Parameters.AddWithValue("@telephone", telephone);
+        cmd.Parameters.AddWithValue("@pesel", pesel);
+        
+        await conn.OpenAsync(cancellationToken);
+        await cmd.ExecuteNonQueryAsync(cancellationToken);
+
+        var newClientId = (int)await cmd.ExecuteScalarAsync(cancellationToken);
+        var newClient = new ClientDto()
+        {
+            IdClient = newClientId,
+            FirstName = firstName,
+            LastName = lastName,
+            Email = email,
+            Telephone = telephone,
+            Pesel = pesel
+        };
+
+        return newClientId;
     }
 }
