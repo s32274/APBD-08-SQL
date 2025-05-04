@@ -16,6 +16,7 @@ public class ClientsController : ControllerBase
     }
     
     // 2. GET /api/clients/{id}/trips
+    // Pobiera wszystkie wycieczki związane z konkretnym klientem
     [HttpGet("{id}/trips")]
     public async Task<IActionResult> GetClientTrips(int id, CancellationToken cancellationToken)
     {
@@ -31,7 +32,7 @@ public class ClientsController : ControllerBase
     
     // 3. POST /api/clients
     // Zwraca nowo utworzone ID klienta
-    [HttpPost("clients")]
+    [HttpPost]
     public async Task<IActionResult> AddClient(
         string firstName,
         string lastName,
@@ -55,5 +56,31 @@ public class ClientsController : ControllerBase
             await _clientService.AddClient(firstName, lastName, email, telephone, pesel, cancellationToken);
         
         return Ok("ID nowego klienta = " + newClientId);
+    }
+    
+    // 4. PUT /api/clients/{id}/trips/{tripId}
+    // Zarejestruje klienta na konkretną wycieczkę
+    [HttpPut("{id}/trips/{tripId}")]
+    public async Task<IActionResult> RegisterClient(int clientId, int tripId, CancellationToken cancellationToken)
+    {
+        var result =  await _clientService.RegisterClient(clientId, tripId, cancellationToken);
+        
+        if (result == -1)
+            return NotFound("Nie ma takiego klienta (id = " + clientId + ") lub wycieczki (id = " + tripId + ").");
+        
+        return Ok("Dodano klienta (id = " + clientId + ") do wycieczki (id = " + tripId + ").");
+    }
+    
+    // 5. DELETE /api/clients/{id}/trips/{tripId}
+    // Usunie rejestrację klienta z wycieczki
+    [HttpDelete("{id}/trips/{tripId}")]
+    public async Task<IActionResult> UnregisterClient(int clientId, int tripId, CancellationToken cancellationToken)
+    {
+        var result = await _clientService.UnregisterClient(clientId, tripId, cancellationToken);
+
+        if (result == -1)
+            return NotFound("Nie ma rejestracji klienta o id = " + clientId + " na wycieczkę o id = " + tripId);
+        
+        return Ok("Usunięto rezerwację klienta o id = " + clientId + " na wycieczkę o id = " + tripId);
     }
 }

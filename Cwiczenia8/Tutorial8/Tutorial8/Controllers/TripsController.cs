@@ -15,6 +15,7 @@ namespace Tutorial8.Controllers
         }
 
         // 1. GET /api/trips
+        // Pobiera wszystkie dostępne wycieczki wraz z ich podstawowymi informacjami
         [HttpGet]
         public async Task<IActionResult> GetTrips(CancellationToken cancellationToken)
         {
